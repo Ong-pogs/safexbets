@@ -1,0 +1,6 @@
+[
+  { "matchId": 1, "home": "Brazil", "away": "Japan", "status": "finished", "homeScore": 2, "awayScore": 1 },
+  { "matchId": 2, "home": "Argentina", "away": "Mexico", "status": "finished", "homeScore": 0, "awayScore": 0 },
+  { "matchId": 3, "home": "France", "away": "Croatia", "status": "finished", "homeScore": 1, "awayScore": 3 },
+  { "matchId": 4, "home": "England", "away": "USA", "status": "scheduled", "homeScore": 0, "awayScore": 0 }
+]
