@@ -1,0 +1,10 @@
+# Normalize line endings to LF (repo is built on macOS/Linux)
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.so binary

@@ -1,0 +1,35 @@
+# --- Rust / Anchor ---
+target/
+**/*.rs.bk
+.anchor/
+test-ledger/
+.crates.toml
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.npm/
+.pnpm-store/
+
+# --- Secrets & keys (NEVER commit) ---
+.env
+.env.local
+.env*.local
+*.pem
+*.key
+wallet.json
+id.json
+keypairs/*.json
+!keypairs/.gitkeep
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
