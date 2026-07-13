@@ -135,6 +135,9 @@ AI market-making · secondary market for locked positions.
 
 ## 11. Demo money-shot
 
-Bet both sides of a real fixture → hit **"advance 7 days"** → yield visibly accrues → post the
-TxLINE result → winner clicks **Claim**, pot lands live; loser sees principal locked with a
-countdown, fully recoverable. One screen, whole thesis.
+Two wallets bet both sides of a fixture → after kickoff **Settle** the TxLINE result → hit
+**"Advance 7 days"** (stacks the losing pool's yield) → winner clicks **Claim**, pot lands live;
+loser sees principal locked with a 7-day countdown, fully recoverable. One screen, whole thesis.
+
+> Advance follows Settle because yield is credited to the *losing* pool, which is only known
+> post-settlement (accruing on the winner would strand funds). The money-shot is identical.

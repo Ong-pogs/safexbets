@@ -1,0 +1,53 @@
+{
+  "source": "TxLINE (fixture)",
+  "note": "Offline stand-in for the TxODDS TxLINE live football feed. Decimal odds are pre-match. Swap src/lib/txline.ts to the live API and this file is no longer read.",
+  "updatedAt": "2026-07-06T09:00:00Z",
+  "competition": "FIFA World Cup 2026",
+  "matches": [
+    {
+      "matchId": 4201,
+      "home": "Brazil",
+      "away": "Japan",
+      "kickoffTs": 1752260400,
+      "proposition": "Brazil to beat Japan?",
+      "line": "Home win",
+      "odds": { "yes": 1.57, "no": 2.45 }
+    },
+    {
+      "matchId": 4202,
+      "home": "England",
+      "away": "Argentina",
+      "kickoffTs": 1752271200,
+      "proposition": "England to beat Argentina?",
+      "line": "Home win",
+      "odds": { "yes": 2.9, "no": 1.42 }
+    },
+    {
+      "matchId": 4203,
+      "home": "France",
+      "away": "Spain",
+      "kickoffTs": 1752346800,
+      "proposition": "France to beat Spain?",
+      "line": "Home win",
+      "odds": { "yes": 2.1, "no": 1.75 }
+    },
+    {
+      "matchId": 4204,
+      "home": "USA",
+      "away": "Mexico",
+      "kickoffTs": 1752357600,
+      "proposition": "USA to beat Mexico?",
+      "line": "Home win",
+      "odds": { "yes": 2.35, "no": 1.6 }
+    },
+    {
+      "matchId": 4205,
+      "home": "Portugal",
+      "away": "Netherlands",
+      "kickoffTs": 1752433200,
+      "proposition": "Portugal to beat Netherlands?",
+      "line": "Home win",
+      "odds": { "yes": 2.05, "no": 1.78 }
+    }
+  ]
+}

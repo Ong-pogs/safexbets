@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pitch-900: #04110a;
+  --pitch-800: #06180e;
+  --pitch-700: #0a2114;
+  --pitch-600: #0e2b1b;
+  --turf-line: #1c4a2e;
+  --chalk: #eefbf1;
+  --chalk-dim: #b9d4c2;
+  --mist: #78a188;
+  --flood: #cbff3e;
+  --yes: #2fe39a;
+  --no: #ff9a3d;
+  --alert: #ff5c6c;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    color: var(--chalk);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    /* Floodlight bloom from the top, a cool rim from the away corner, over deep pitch. */
+    background:
+      radial-gradient(130% 85% at 50% -20%, rgba(203, 255, 62, 0.1), transparent 55%),
+      radial-gradient(90% 120% at 102% -10%, rgba(47, 227, 154, 0.06), transparent 55%),
+      var(--pitch-900);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: var(--flood);
+    color: #04110a;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--flood);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(238, 251, 241, 0.12);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(238, 251, 241, 0.22);
+  }
+}
+
+@layer components {
+  /* Scoreboard surface. */
+  .panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 42%),
+      var(--pitch-700);
+    border: 1px solid rgba(238, 251, 241, 0.08);
+    border-radius: 18px;
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 26px 50px -30px rgba(0, 0, 0, 0.85);
+  }
+
+  /* LED / stadium-clock numerals. */
+  .led {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .led-glow {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  /* A chalk line drawn on the pitch. */
+  .chalk-hr {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(238, 251, 241, 0.16), transparent);
+    border: 0;
+  }
+
+  /* Small uppercase kit-label. */
+  .kit-label {
+    font-family: var(--font-display), sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+
+  /* Fine dotted grain to kill flat gradients. */
+  .grain {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.5) 0.5px, transparent 0.5px);
+    background-size: 4px 4px;
+    opacity: 0.02;
+  }
+}
+
+/* ---- wallet-adapter-react-ui theme override (match the scoreboard) ---- */
+.wallet-adapter-button {
+  background: var(--flood) !important;
+  color: #04110a !important;
+  font-family: var(--font-display), sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-size: 13px !important;
+  height: auto !important;
+  line-height: 1 !important;
+  padding: 11px 18px !important;
+  border-radius: 12px !important;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease !important;
+}
+.wallet-adapter-button:not([disabled]):hover {
+  background: var(--flood) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px -10px rgba(203, 255, 62, 0.6) !important;
+}
+.wallet-adapter-button[disabled] {
+  background: rgba(238, 251, 241, 0.1) !important;
+  color: var(--mist) !important;
+}
+.wallet-adapter-modal-wrapper {
+  background: var(--pitch-700) !important;
+  border: 1px solid rgba(238, 251, 241, 0.1) !important;
+  border-radius: 20px !important;
+}
+.wallet-adapter-modal-title {
+  color: var(--chalk) !important;
+  font-family: var(--font-display), sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: var(--pitch-600) !important;
+  color: var(--chalk) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-family: var(--font-body), sans-serif !important;
+}
+.wallet-adapter-dropdown-list {
+  background: var(--pitch-600) !important;
+  border: 1px solid rgba(238, 251, 241, 0.1) !important;
+}
+.wallet-adapter-dropdown-list-item {
+  color: var(--chalk) !important;
+  font-family: var(--font-body), sans-serif !important;
+}

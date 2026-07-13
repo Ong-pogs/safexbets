@@ -126,14 +126,22 @@ npm run settle -- <MARKET_PUBKEY> yes
 ## 7. Run the frontend
 
 **Prompt to paste:**
-> In ./app run `npm install` then `npm run dev`, and open http://localhost:3000. Connect a devnet
-> wallet funded with the mock-USDC mint.
+> Copy the freshly built IDL into the app, configure its env, then run it. From repo root:
+> `cp target/idl/safexbets.json app/src/idl/safexbets.json`; in ./app copy `.env.local.example` to
+> `.env.local` and set `NEXT_PUBLIC_PROGRAM_ID` + `NEXT_PUBLIC_PRINCIPAL_MINT`; then
+> `npm install && npm run dev` and open http://localhost:3000. Connect a devnet wallet funded with
+> mock-USDC.
 
 ```bash
+# from repo root, AFTER `anchor build` (so the real IDL exists):
+cp target/idl/safexbets.json app/src/idl/safexbets.json
 cd app
+cp .env.local.example .env.local
+# edit .env.local: NEXT_PUBLIC_PROGRAM_ID, NEXT_PUBLIC_PRINCIPAL_MINT, NEXT_PUBLIC_RPC_URL
 npm install
 npm run dev
 ```
+
 
 ---
 

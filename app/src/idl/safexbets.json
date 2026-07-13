@@ -1,0 +1,180 @@
+{
+  "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+  "metadata": {
+    "name": "safexbets",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "No-loss World Cup prediction market on Solana, settled by TxLINE. PLACEHOLDER IDL — the Mac's `anchor build` output (target/idl/safexbets.json) must be copied over this file before running against a real deployment."
+  },
+  "instructions": [
+    {
+      "name": "initialize_market",
+      "discriminator": [35, 35, 189, 193, 155, 48, 170, 203],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "principal_mint" },
+        { "name": "market", "writable": true },
+        { "name": "vault", "writable": true },
+        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
+        { "name": "system_program", "address": "11111111111111111111111111111111" },
+        { "name": "rent", "address": "SysvarRent111111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "match_id", "type": "u64" },
+        { "name": "proposition", "type": "string" },
+        { "name": "kickoff_ts", "type": "i64" },
+        { "name": "lock_period", "type": "i64" }
+      ]
+    },
+    {
+      "name": "place_bet",
+      "discriminator": [222, 62, 67, 220, 63, 166, 126, 33],
+      "accounts": [
+        { "name": "bettor", "writable": true, "signer": true },
+        { "name": "market", "writable": true },
+        { "name": "vault", "writable": true },
+        { "name": "bettor_token", "writable": true },
+        { "name": "position", "writable": true },
+        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "side", "type": { "defined": { "name": "Side" } } },
+        { "name": "amount", "type": "u64" }
+      ]
+    },
+    {
+      "name": "accrue",
+      "discriminator": [23, 76, 128, 149, 229, 247, 72, 228],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "market", "writable": true },
+        { "name": "vault", "writable": true },
+        { "name": "authority_token", "writable": true },
+        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+      ],
+      "args": [
+        { "name": "side", "type": { "defined": { "name": "Side" } } },
+        { "name": "amount", "type": "u64" }
+      ]
+    },
+    {
+      "name": "settle",
+      "discriminator": [175, 42, 185, 87, 144, 131, 102, 212],
+      "accounts": [
+        { "name": "authority", "signer": true },
+        { "name": "market", "writable": true }
+      ],
+      "args": [{ "name": "outcome", "type": { "defined": { "name": "Outcome" } } }]
+    },
+    {
+      "name": "claim",
+      "discriminator": [62, 198, 214, 193, 213, 159, 108, 210],
+      "accounts": [
+        { "name": "owner", "writable": true, "signer": true },
+        { "name": "market", "writable": true },
+        { "name": "vault", "writable": true },
+        { "name": "position", "writable": true },
+        { "name": "owner_token", "writable": true },
+        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_principal",
+      "discriminator": [6, 59, 175, 16, 210, 146, 119, 63],
+      "accounts": [
+        { "name": "owner", "writable": true, "signer": true },
+        { "name": "market", "writable": true },
+        { "name": "vault", "writable": true },
+        { "name": "position", "writable": true },
+        { "name": "owner_token", "writable": true },
+        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    { "name": "Market", "discriminator": [219, 190, 213, 55, 0, 227, 198, 154] },
+    { "name": "Position", "discriminator": [170, 188, 143, 228, 122, 64, 247, 208] }
+  ],
+  "errors": [
+    { "code": 6000, "name": "PropositionTooLong", "msg": "Proposition string too long" },
+    { "code": 6001, "name": "MarketNotOpen", "msg": "Market is not open for betting" },
+    { "code": 6002, "name": "BettingClosed", "msg": "Betting has closed (kickoff passed)" },
+    { "code": 6003, "name": "AlreadySettled", "msg": "Market already settled" },
+    { "code": 6004, "name": "NotSettled", "msg": "Market not settled yet" },
+    { "code": 6005, "name": "Unauthorized", "msg": "Only the market authority can do this" },
+    { "code": 6006, "name": "MatchNotStarted", "msg": "Match has not kicked off yet" },
+    { "code": 6007, "name": "SideMismatch", "msg": "You already have a position on the other side" },
+    { "code": 6008, "name": "NotWinner", "msg": "Not a winning position" },
+    { "code": 6009, "name": "NotLoser", "msg": "Not a losing position" },
+    { "code": 6010, "name": "StillLocked", "msg": "Principal is still locked" },
+    { "code": 6011, "name": "AlreadyWithdrawn", "msg": "Principal already withdrawn" },
+    { "code": 6012, "name": "AlreadyClaimed", "msg": "Nothing left to claim" },
+    { "code": 6013, "name": "ZeroAmount", "msg": "Amount must be greater than zero" },
+    { "code": 6014, "name": "MathOverflow", "msg": "Math overflow" },
+    { "code": 6015, "name": "InvalidOutcome", "msg": "Invalid or unset outcome" },
+    { "code": 6016, "name": "WrongMint", "msg": "Token mint does not match the market principal mint" }
+  ],
+  "types": [
+    {
+      "name": "Side",
+      "type": { "kind": "enum", "variants": [{ "name": "Yes" }, { "name": "No" }] }
+    },
+    {
+      "name": "MarketStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [{ "name": "Open" }, { "name": "Locked" }, { "name": "Settled" }, { "name": "Void" }]
+      }
+    },
+    {
+      "name": "Outcome",
+      "type": {
+        "kind": "enum",
+        "variants": [{ "name": "Unset" }, { "name": "Yes" }, { "name": "No" }, { "name": "Void" }]
+      }
+    },
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "match_id", "type": "u64" },
+          { "name": "proposition", "type": "string" },
+          { "name": "principal_mint", "type": "pubkey" },
+          { "name": "vault", "type": "pubkey" },
+          { "name": "kickoff_ts", "type": "i64" },
+          { "name": "lock_period", "type": "i64" },
+          { "name": "status", "type": { "defined": { "name": "MarketStatus" } } },
+          { "name": "outcome", "type": { "defined": { "name": "Outcome" } } },
+          { "name": "winner_side", "type": { "option": { "defined": { "name": "Side" } } } },
+          { "name": "yes_principal", "type": "u64" },
+          { "name": "no_principal", "type": "u64" },
+          { "name": "yes_yield", "type": "u64" },
+          { "name": "no_yield", "type": "u64" },
+          { "name": "loser_unlock_ts", "type": "i64" },
+          { "name": "settled_ts", "type": "i64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "market", "type": "pubkey" },
+          { "name": "owner", "type": "pubkey" },
+          { "name": "side", "type": { "defined": { "name": "Side" } } },
+          { "name": "principal", "type": "u64" },
+          { "name": "principal_withdrawn", "type": "bool" },
+          { "name": "yield_claimed", "type": "bool" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ]
+}
