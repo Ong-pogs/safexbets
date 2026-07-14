@@ -1,6 +1,7 @@
 "use client";
 
 import { PublicKey } from "@solana/web3.js";
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { BetModal } from "@/components/BetModal";
@@ -53,6 +54,7 @@ export default function Home() {
 
       <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
         <Hero />
+        <FeaturedMatchCenter />
         <ConfigBanner />
 
         <MarketsBoard
@@ -132,10 +134,13 @@ function Hero() {
           <span className="text-chalk">100%</span>. A clean sheet — concede nothing.
         </p>
 
-        <div className="mt-7 grid gap-3 sm:grid-cols-3">
-          <Step n="01" title="Back a side" body="Deposit mock-USDC on Yes or No. Odds emerge from the pools." />
-          <Step n="02" title="TxLINE settles" body="The oracle posts the match result on-chain. No pricing engine." />
-          <Step n="03" title="Clean sheet" body="Winners take the yield; losers recover every cent of principal." />
+        <div className="mt-7">
+          <div className="kit-label mb-2 text-[10px] text-mist">How it works</div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Step n="01" title="Back a side" body="Deposit mock-USDC on Yes or No. Odds emerge from the pools." />
+            <Step n="02" title="TxLINE settles" body="The oracle posts the match result on-chain. No pricing engine." />
+            <Step n="03" title="Clean sheet" body="Winners take the losers' yield; losers recover every cent of principal." />
+          </div>
         </div>
 
         <p className="mt-6 text-[11px] text-mist">
@@ -158,6 +163,54 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
   );
 }
 
+/**
+ * Featured Match Center entry: the bundled Brazil–Norway TxLINE replay (fixture 18187298 — the
+ * one devnet fixture with a full stored replay, also served by /api/txline/replay).
+ */
+function FeaturedMatchCenter() {
+  return (
+    <Link
+      href="/match/18187298"
+      className="panel group relative flex flex-wrap items-center justify-between gap-4 overflow-hidden p-5 transition hover:border-flood/30 sm:p-6"
+    >
+      {/* faint chalk pitch-lines motif */}
+      <svg
+        className="pointer-events-none absolute -right-6 top-1/2 h-[220%] w-56 -translate-y-1/2 opacity-[0.07] transition-opacity group-hover:opacity-[0.12]"
+        viewBox="0 0 200 300"
+        fill="none"
+        stroke="#EEFBF1"
+        strokeWidth="2"
+        aria-hidden
+      >
+        <rect x="10" y="10" width="180" height="280" />
+        <line x1="10" y1="150" x2="190" y2="150" />
+        <circle cx="100" cy="150" r="38" />
+        <rect x="45" y="10" width="110" height="46" />
+        <rect x="45" y="244" width="110" height="46" />
+      </svg>
+
+      <div className="relative min-w-0">
+        <div className="kit-label mb-1.5 inline-flex items-center gap-2 text-[10px] text-flood">
+          <span className="h-1.5 w-1.5 rounded-full bg-flood motion-safe:animate-live-pulse" />
+          Match Center · full replay
+        </div>
+        <div className="font-display text-2xl font-bold uppercase leading-tight tracking-wide text-chalk sm:text-3xl">
+          Brazil <span className="text-mist">vs</span> Norway{" "}
+          <span className="led led-glow ml-1 text-flood">1–2</span>
+        </div>
+        <p className="mt-1 max-w-md text-xs leading-relaxed text-mist">
+          Every TxLINE event of the devnet replay — goals, VAR drama, the late penalty — on a 3D
+          pitch, wired to its on-chain market.
+        </p>
+      </div>
+
+      <span className="kit-label relative shrink-0 rounded-xl bg-flood px-4 py-2.5 text-sm text-pitch-900 transition group-hover:shadow-[0_10px_26px_-10px_rgba(203,255,62,0.6)]">
+        Watch the replay →
+      </span>
+    </Link>
+  );
+}
+
 function Footer() {
   return (
     <footer className="mt-4 border-t border-white/8 pt-6 text-xs text-mist">
@@ -167,6 +220,12 @@ function Footer() {
         </span>
         <span>Devnet · unaudited hackathon build · not financial advice</span>
       </div>
+      <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-mist/80">
+        Experimental software on Solana devnet using mock USDC — no real-money wagering, no
+        inducement to gamble. 18+ where prediction games are age-restricted; play for the sport,
+        not the stake. Match data is a TxLINE devnet replay; the 3D pitch view is a Metrica
+        open-data demo visualization.
+      </p>
     </footer>
   );
 }

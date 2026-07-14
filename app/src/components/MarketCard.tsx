@@ -2,6 +2,7 @@
 
 import { BN } from "@coral-xyz/anchor";
 import clsx from "clsx";
+import Link from "next/link";
 import { useNow } from "@/hooks/useNow";
 import { formatDateTime, formatUsdc, formatUsdcCompact, pct, poolShare } from "@/lib/format";
 import { marketPhase, prizePot, type MarketPhase } from "@/lib/market-view";
@@ -46,6 +47,13 @@ export function MarketCard({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="led text-[11px] text-mist">MATCH #{matchId}</span>
+          <Link
+            href={`/match/${matchId}`}
+            className="kit-label rounded border border-flood/25 bg-flood/[0.06] px-1.5 py-0.5 text-[9px] text-flood transition hover:bg-flood/15"
+            title="Open the Match Center for this fixture"
+          >
+            Match Center →
+          </Link>
           {isOperator && (
             <span className="kit-label rounded bg-flood/15 px-1.5 py-0.5 text-[9px] text-flood">
               you run this

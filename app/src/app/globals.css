@@ -104,6 +104,43 @@
     background-size: 4px 4px;
     opacity: 0.02;
   }
+
+  /* Match Center transport scrubber — a broadcast jog bar with a pennant thumb. */
+  .scrubber {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .scrubber::-webkit-slider-runnable-track {
+    height: 22px;
+    background: transparent;
+  }
+  .scrubber::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 22px;
+    background: var(--flood);
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    cursor: grab;
+  }
+  .scrubber::-webkit-slider-thumb:active {
+    cursor: grabbing;
+  }
+  .scrubber::-moz-range-track {
+    height: 22px;
+    background: transparent;
+  }
+  .scrubber::-moz-range-thumb {
+    width: 14px;
+    height: 22px;
+    border: 0;
+    border-radius: 0;
+    background: var(--flood);
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    cursor: grab;
+  }
 }
 
 /* ---- wallet-adapter-react-ui theme override (match the scoreboard) ---- */

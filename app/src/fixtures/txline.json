@@ -5,6 +5,15 @@
   "competition": "FIFA World Cup 2026",
   "matches": [
     {
+      "matchId": 18187298,
+      "home": "Brazil",
+      "away": "Norway",
+      "kickoffTs": 1783281600,
+      "proposition": "Brazil to beat Norway?",
+      "line": "Home win",
+      "odds": { "yes": 1.36, "no": 3.1 }
+    },
+    {
       "matchId": 4201,
       "home": "Brazil",
       "away": "Japan",

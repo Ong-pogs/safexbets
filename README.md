@@ -64,8 +64,10 @@ git clone https://github.com/Ong-pogs/safexbets && cd safexbets
 
 ## Status
 
-🚧 Hackathon build in progress. MVP = devnet, mock yield, pro-rata payouts, TxLINE-signed
-settlement. Roadmap (real Kamino, 1X2, VRF lottery, sponsor boosts) in [`docs/PLAN.md`](docs/PLAN.md).
+✅ Live on devnet: program + relayer (real TxLINE feed) + frontend. Includes the **Match Center**
+(`/match/18187298`) — a broadcast-style replay of Brazil vs Norway driven by TxLINE devnet data,
+with a 3D tracking visualization (Metrica open data, labeled) and the on-chain market alongside.
+Roadmap (real Kamino, 1X2, VRF lottery, sponsor boosts) in [`docs/PLAN.md`](docs/PLAN.md).
 
 ## Disclaimer
 
