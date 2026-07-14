@@ -9,7 +9,7 @@ use instructions::*;
 use state::{Outcome, Side};
 
 // Placeholder ID — run `anchor keys sync` on the Mac to set the real deployed program ID.
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("9S26TJqALxW7UjsSnpr1FqNk8LudsXsRK5HYbH4UbPe8");
 
 #[program]
 pub mod safexbets {

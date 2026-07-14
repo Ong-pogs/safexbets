@@ -1,178 +1,770 @@
 {
-  "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+  "address": "9S26TJqALxW7UjsSnpr1FqNk8LudsXsRK5HYbH4UbPe8",
   "metadata": {
     "name": "safexbets",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "No-loss World Cup prediction market on Solana, settled by TxLINE. PLACEHOLDER IDL — the Mac's `anchor build` output (target/idl/safexbets.json) must be copied over this file before running against a real deployment."
+    "description": "No-loss World Cup prediction market settled by TxLINE"
   },
   "instructions": [
     {
-      "name": "initialize_market",
-      "discriminator": [35, 35, 189, 193, 155, 48, 170, 203],
-      "accounts": [
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "principal_mint" },
-        { "name": "market", "writable": true },
-        { "name": "vault", "writable": true },
-        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
-        { "name": "system_program", "address": "11111111111111111111111111111111" },
-        { "name": "rent", "address": "SysvarRent111111111111111111111111111111111" }
-      ],
-      "args": [
-        { "name": "match_id", "type": "u64" },
-        { "name": "proposition", "type": "string" },
-        { "name": "kickoff_ts", "type": "i64" },
-        { "name": "lock_period", "type": "i64" }
-      ]
-    },
-    {
-      "name": "place_bet",
-      "discriminator": [222, 62, 67, 220, 63, 166, 126, 33],
-      "accounts": [
-        { "name": "bettor", "writable": true, "signer": true },
-        { "name": "market", "writable": true },
-        { "name": "vault", "writable": true },
-        { "name": "bettor_token", "writable": true },
-        { "name": "position", "writable": true },
-        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
-        { "name": "system_program", "address": "11111111111111111111111111111111" }
-      ],
-      "args": [
-        { "name": "side", "type": { "defined": { "name": "Side" } } },
-        { "name": "amount", "type": "u64" }
-      ]
-    },
-    {
       "name": "accrue",
-      "discriminator": [23, 76, 128, 149, 229, 247, 72, 228],
+      "docs": [
+        "Devnet MockYield: authority credits simulated yield to a pool (the demo fast-forward)."
+      ],
+      "discriminator": [
+        23,
+        76,
+        128,
+        149,
+        229,
+        247,
+        72,
+        228
+      ],
       "accounts": [
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "market", "writable": true },
-        { "name": "vault", "writable": true },
-        { "name": "authority_token", "writable": true },
-        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "authority_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
       ],
       "args": [
-        { "name": "side", "type": { "defined": { "name": "Side" } } },
-        { "name": "amount", "type": "u64" }
+        {
+          "name": "side",
+          "type": {
+            "defined": {
+              "name": "Side"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
       ]
-    },
-    {
-      "name": "settle",
-      "discriminator": [175, 42, 185, 87, 144, 131, 102, 212],
-      "accounts": [
-        { "name": "authority", "signer": true },
-        { "name": "market", "writable": true }
-      ],
-      "args": [{ "name": "outcome", "type": { "defined": { "name": "Outcome" } } }]
     },
     {
       "name": "claim",
-      "discriminator": [62, 198, 214, 193, 213, 159, 108, 210],
+      "docs": [
+        "Winner: principal back + pro-rata share of the losers' yield."
+      ],
+      "discriminator": [
+        62,
+        198,
+        214,
+        193,
+        213,
+        159,
+        108,
+        210
+      ],
       "accounts": [
-        { "name": "owner", "writable": true, "signer": true },
-        { "name": "market", "writable": true },
-        { "name": "vault", "writable": true },
-        { "name": "position", "writable": true },
-        { "name": "owner_token", "writable": true },
-        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
       ],
       "args": []
     },
     {
-      "name": "withdraw_principal",
-      "discriminator": [6, 59, 175, 16, 210, 146, 119, 63],
+      "name": "initialize_market",
+      "docs": [
+        "Open a binary Yes/No market for a match proposition. `lock_period <= 0` uses the 7-day default."
+      ],
+      "discriminator": [
+        35,
+        35,
+        189,
+        193,
+        155,
+        48,
+        170,
+        203
+      ],
       "accounts": [
-        { "name": "owner", "writable": true, "signer": true },
-        { "name": "market", "writable": true },
-        { "name": "vault", "writable": true },
-        { "name": "position", "writable": true },
-        { "name": "owner_token", "writable": true },
-        { "name": "token_program", "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "principal_mint"
+        },
+        {
+          "name": "market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "u64"
+        },
+        {
+          "name": "proposition",
+          "type": "string"
+        },
+        {
+          "name": "kickoff_ts",
+          "type": "i64"
+        },
+        {
+          "name": "lock_period",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "place_bet",
+      "docs": [
+        "Place a pre-kickoff bet on a side. Principal moves into the vault."
+      ],
+      "discriminator": [
+        222,
+        62,
+        67,
+        220,
+        63,
+        166,
+        126,
+        33
+      ],
+      "accounts": [
+        {
+          "name": "bettor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "bettor_token",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "bettor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "side",
+          "type": {
+            "defined": {
+              "name": "Side"
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "settle",
+      "docs": [
+        "Post the TxLINE result and settle the market."
+      ],
+      "discriminator": [
+        175,
+        42,
+        185,
+        87,
+        144,
+        131,
+        102,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "market"
+          ]
+        },
+        {
+          "name": "market",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "outcome",
+          "type": {
+            "defined": {
+              "name": "Outcome"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "withdraw_principal",
+      "docs": [
+        "Loser (after lock) or anyone (on void): withdraw 100% of principal."
+      ],
+      "discriminator": [
+        6,
+        59,
+        175,
+        16,
+        210,
+        146,
+        119,
+        63
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "market",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_token",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
       ],
       "args": []
     }
   ],
   "accounts": [
-    { "name": "Market", "discriminator": [219, 190, 213, 55, 0, 227, 198, 154] },
-    { "name": "Position", "discriminator": [170, 188, 143, 228, 122, 64, 247, 208] }
+    {
+      "name": "Market",
+      "discriminator": [
+        219,
+        190,
+        213,
+        55,
+        0,
+        227,
+        198,
+        154
+      ]
+    },
+    {
+      "name": "Position",
+      "discriminator": [
+        170,
+        188,
+        143,
+        228,
+        122,
+        64,
+        247,
+        208
+      ]
+    }
   ],
   "errors": [
-    { "code": 6000, "name": "PropositionTooLong", "msg": "Proposition string too long" },
-    { "code": 6001, "name": "MarketNotOpen", "msg": "Market is not open for betting" },
-    { "code": 6002, "name": "BettingClosed", "msg": "Betting has closed (kickoff passed)" },
-    { "code": 6003, "name": "AlreadySettled", "msg": "Market already settled" },
-    { "code": 6004, "name": "NotSettled", "msg": "Market not settled yet" },
-    { "code": 6005, "name": "Unauthorized", "msg": "Only the market authority can do this" },
-    { "code": 6006, "name": "MatchNotStarted", "msg": "Match has not kicked off yet" },
-    { "code": 6007, "name": "SideMismatch", "msg": "You already have a position on the other side" },
-    { "code": 6008, "name": "NotWinner", "msg": "Not a winning position" },
-    { "code": 6009, "name": "NotLoser", "msg": "Not a losing position" },
-    { "code": 6010, "name": "StillLocked", "msg": "Principal is still locked" },
-    { "code": 6011, "name": "AlreadyWithdrawn", "msg": "Principal already withdrawn" },
-    { "code": 6012, "name": "AlreadyClaimed", "msg": "Nothing left to claim" },
-    { "code": 6013, "name": "ZeroAmount", "msg": "Amount must be greater than zero" },
-    { "code": 6014, "name": "MathOverflow", "msg": "Math overflow" },
-    { "code": 6015, "name": "InvalidOutcome", "msg": "Invalid or unset outcome" },
-    { "code": 6016, "name": "WrongMint", "msg": "Token mint does not match the market principal mint" }
+    {
+      "code": 6000,
+      "name": "PropositionTooLong",
+      "msg": "Proposition string too long"
+    },
+    {
+      "code": 6001,
+      "name": "MarketNotOpen",
+      "msg": "Market is not open for betting"
+    },
+    {
+      "code": 6002,
+      "name": "BettingClosed",
+      "msg": "Betting has closed (kickoff passed)"
+    },
+    {
+      "code": 6003,
+      "name": "AlreadySettled",
+      "msg": "Market already settled"
+    },
+    {
+      "code": 6004,
+      "name": "NotSettled",
+      "msg": "Market not settled yet"
+    },
+    {
+      "code": 6005,
+      "name": "Unauthorized",
+      "msg": "Only the market authority can do this"
+    },
+    {
+      "code": 6006,
+      "name": "MatchNotStarted",
+      "msg": "Match has not kicked off yet"
+    },
+    {
+      "code": 6007,
+      "name": "SideMismatch",
+      "msg": "You already have a position on the other side"
+    },
+    {
+      "code": 6008,
+      "name": "NotWinner",
+      "msg": "Not a winning position"
+    },
+    {
+      "code": 6009,
+      "name": "NotLoser",
+      "msg": "Not a losing position"
+    },
+    {
+      "code": 6010,
+      "name": "StillLocked",
+      "msg": "Principal is still locked"
+    },
+    {
+      "code": 6011,
+      "name": "AlreadyWithdrawn",
+      "msg": "Principal already withdrawn"
+    },
+    {
+      "code": 6012,
+      "name": "AlreadyClaimed",
+      "msg": "Nothing left to claim"
+    },
+    {
+      "code": 6013,
+      "name": "ZeroAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6014,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6015,
+      "name": "InvalidOutcome",
+      "msg": "Invalid or unset outcome"
+    },
+    {
+      "code": 6016,
+      "name": "WrongMint",
+      "msg": "Token mint does not match the market principal mint"
+    }
   ],
   "types": [
     {
-      "name": "Side",
-      "type": { "kind": "enum", "variants": [{ "name": "Yes" }, { "name": "No" }] }
+      "name": "Market",
+      "docs": [
+        "A single binary market for one match proposition (e.g. \"Home to win?\").",
+        "",
+        "Pools are stored inline (yes_/no_) to keep the account count small. The program is",
+        "**yield-agnostic**: `*_yield` is credited by the active YieldSource (MockYield on devnet,",
+        "KaminoYield on mainnet). The losing side's accrued yield is the prize for winners."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "Admin + oracle authority (relayer). May accrue yield and settle."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "match_id",
+            "docs": [
+              "External match identifier (from TxLINE)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "proposition",
+            "type": "string"
+          },
+          {
+            "name": "principal_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "vault",
+            "docs": [
+              "Program-owned token account holding pooled principal + yield."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "kickoff_ts",
+            "docs": [
+              "Betting closes at kickoff."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "lock_period",
+            "docs": [
+              "Loser lock duration (seconds)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "MarketStatus"
+              }
+            }
+          },
+          {
+            "name": "outcome",
+            "type": {
+              "defined": {
+                "name": "Outcome"
+              }
+            }
+          },
+          {
+            "name": "winner_side",
+            "docs": [
+              "Set at settle. None while open or on Void."
+            ],
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "Side"
+                }
+              }
+            }
+          },
+          {
+            "name": "yes_principal",
+            "type": "u64"
+          },
+          {
+            "name": "no_principal",
+            "type": "u64"
+          },
+          {
+            "name": "yes_yield",
+            "type": "u64"
+          },
+          {
+            "name": "no_yield",
+            "type": "u64"
+          },
+          {
+            "name": "loser_unlock_ts",
+            "docs": [
+              "When losers may withdraw principal (settle_ts + lock_period)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "settled_ts",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
     },
     {
       "name": "MarketStatus",
       "type": {
         "kind": "enum",
-        "variants": [{ "name": "Open" }, { "name": "Locked" }, { "name": "Settled" }, { "name": "Void" }]
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Locked"
+          },
+          {
+            "name": "Settled"
+          },
+          {
+            "name": "Void"
+          }
+        ]
       }
     },
     {
       "name": "Outcome",
       "type": {
         "kind": "enum",
-        "variants": [{ "name": "Unset" }, { "name": "Yes" }, { "name": "No" }, { "name": "Void" }]
-      }
-    },
-    {
-      "name": "Market",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "authority", "type": "pubkey" },
-          { "name": "match_id", "type": "u64" },
-          { "name": "proposition", "type": "string" },
-          { "name": "principal_mint", "type": "pubkey" },
-          { "name": "vault", "type": "pubkey" },
-          { "name": "kickoff_ts", "type": "i64" },
-          { "name": "lock_period", "type": "i64" },
-          { "name": "status", "type": { "defined": { "name": "MarketStatus" } } },
-          { "name": "outcome", "type": { "defined": { "name": "Outcome" } } },
-          { "name": "winner_side", "type": { "option": { "defined": { "name": "Side" } } } },
-          { "name": "yes_principal", "type": "u64" },
-          { "name": "no_principal", "type": "u64" },
-          { "name": "yes_yield", "type": "u64" },
-          { "name": "no_yield", "type": "u64" },
-          { "name": "loser_unlock_ts", "type": "i64" },
-          { "name": "settled_ts", "type": "i64" },
-          { "name": "bump", "type": "u8" }
+        "variants": [
+          {
+            "name": "Unset"
+          },
+          {
+            "name": "Yes"
+          },
+          {
+            "name": "No"
+          },
+          {
+            "name": "Void"
+          }
         ]
       }
     },
     {
       "name": "Position",
+      "docs": [
+        "One bettor's position in a market. One side per (market, owner)."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "market", "type": "pubkey" },
-          { "name": "owner", "type": "pubkey" },
-          { "name": "side", "type": { "defined": { "name": "Side" } } },
-          { "name": "principal", "type": "u64" },
-          { "name": "principal_withdrawn", "type": "bool" },
-          { "name": "yield_claimed", "type": "bool" },
-          { "name": "bump", "type": "u8" }
+          {
+            "name": "market",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "side",
+            "type": {
+              "defined": {
+                "name": "Side"
+              }
+            }
+          },
+          {
+            "name": "principal",
+            "type": "u64"
+          },
+          {
+            "name": "principal_withdrawn",
+            "type": "bool"
+          },
+          {
+            "name": "yield_claimed",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Side",
+      "docs": [
+        "Which side of a binary Yes/No proposition a position backs."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Yes"
+          },
+          {
+            "name": "No"
+          }
         ]
       }
     }

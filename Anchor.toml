@@ -5,17 +5,17 @@ anchor_version = "0.31.1"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-safexbets = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
-
 [programs.devnet]
-safexbets = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+safexbets = "9S26TJqALxW7UjsSnpr1FqNk8LudsXsRK5HYbH4UbPe8"
+
+[programs.localnet]
+safexbets = "9S26TJqALxW7UjsSnpr1FqNk8LudsXsRK5HYbH4UbPe8"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "localnet"
 wallet = "keypairs/oracle.json"
 
 [scripts]
