@@ -9,7 +9,9 @@
     "create-market": "tsx src/index.ts create-market",
     "accrue": "tsx src/index.ts accrue",
     "settle": "tsx src/index.ts settle",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "list-fixtures": "tsx src/index.ts list-fixtures",
+    "seed-fixtures": "tsx src/index.ts seed-fixtures"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",

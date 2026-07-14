@@ -42,11 +42,25 @@ automatically. (You can reuse `keypairs/oracle.json` as the wallet — just fund
 If activation fails, the sponsor asked for **only your wallet pubkey + the subscribe tx signature**
 (never share the JWT) → t.me/TxLINEChat.
 
-## Mapping to our market
-Create each market with `match_id = TxLINE fixtureId`. Settlement calls `/scores/historical/{id}`,
-reads the final score, and resolves *"Home to win?"* → `homeScore > awayScore ? yes : no`
-(draw/away → **no**). ⚠️ Confirm exact score field names against a live payload — `txline.ts` tries
-`homeScore/HomeScore/home/h` (and away equivalents) and returns `void` if it can't read them.
+## Mapping to our market (confirmed against a live devnet payload)
+Create each market with `match_id = TxLINE fixtureId` (from `/fixtures/snapshot`). Home team =
+`Participant1` when `Participant1IsHome`, else `Participant2`. Use `npm run seed-fixtures` /
+`list-fixtures` in the relayer.
+
+`/scores/historical/{fixtureId}` returns an **SSE text stream** (`data: {json}` blocks), *not* JSON.
+Each event carries `Action`, `GameState`, `Participant1IsHome`, and a flat **`Stats`** map keyed by
+`period_prefix + base_key` (numeric values):
+- `"1"` / `"2"` = Participant1 / Participant2 **total goals**
+- `"6001"` / `"6002"` = penalty-shootout goals
+- `3–8` = yellow/red cards, corners; `1000/2000/3000/…` prefixes = per-period
+
+Settlement (`relayer/src/txline.ts`): take the **latest non-empty `Stats` snapshot**, winner = more
+goals (`1` vs `2`); if level, penalties (`6001` vs `6002`); still level → draw → **No**. Map the
+winner to home via `Participant1IsHome`. *"Home to win?"* = Yes iff the home team won.
+
+⚠️ Devnet leaves `GameState = "scheduled"` even on completed replays, so we settle from `Stats`, not
+`GameState`. **Demo fixture: `18187298`** has a full replay (final **1–2**) — use it for a real
+live-feed settlement demo: `npm run settle -- <MARKET> --from-txline 18187298`.
 
 ## 🌟 Hero: on-chain validation proofs
 `examples/devnet/scripts/fixture_validation_view_only.ts` demonstrates TxLINE's **validation proofs**
