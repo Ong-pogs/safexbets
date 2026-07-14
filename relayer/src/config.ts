@@ -4,7 +4,8 @@ import fs from "fs";
 import path from "path";
 
 // Load repo-root .env (the relayer runs from ./relayer).
-dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
+const REPO_ROOT = path.resolve(process.cwd(), "..");
+dotenv.config({ path: path.join(REPO_ROOT, ".env") });
 
 export const NETWORK = process.env.NETWORK ?? "devnet";
 export const RPC_URL =
@@ -25,8 +26,9 @@ export const PRINCIPAL_MINT = process.env.PRINCIPAL_MINT
 export const connection = new Connection(RPC_URL, "confirmed");
 
 export function loadOracleKeypair(): Keypair {
-  const p = process.env.ORACLE_KEYPAIR ?? "../keypairs/oracle.json";
-  const resolved = path.resolve(process.cwd(), p);
+  // Paths in the root .env are repo-root-relative, not relayer-relative.
+  const p = process.env.ORACLE_KEYPAIR ?? "./keypairs/oracle.json";
+  const resolved = path.resolve(REPO_ROOT, p);
   const secret = JSON.parse(fs.readFileSync(resolved, "utf-8"));
   return Keypair.fromSecretKey(Uint8Array.from(secret));
 }
