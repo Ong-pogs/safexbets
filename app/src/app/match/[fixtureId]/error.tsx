@@ -33,10 +33,10 @@ export default function MatchError({
           Try again
         </Button>
         <Link
-          href="/"
+          href="/matches"
           className="kit-label rounded-xl border border-white/15 px-4 py-2.5 text-sm text-chalk transition hover:border-flood/60 hover:text-flood"
         >
-          Back to markets
+          Back to matches
         </Link>
       </div>
     </main>

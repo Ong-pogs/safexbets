@@ -102,3 +102,32 @@ export function canWithdraw(m: MarketAccount, pos: PositionAccount): boolean {
   }
   return false;
 }
+
+/**
+ * Betslip-style position state for My Bets:
+ *   open        — market unsettled; principal working in the vault
+ *   claimable   — winner with principal and/or prize still to collect
+ *   locked      — loser inside the lock window (countdown to 100% recovery)
+ *   recoverable — loser past the lock, principal ready to withdraw
+ *   collected   — winner, fully paid out
+ *   recovered   — principal withdrawn (loser after lock, or void refund taken)
+ *   void        — market voided, refund available anytime
+ */
+export type PositionState =
+  | "open"
+  | "claimable"
+  | "locked"
+  | "recoverable"
+  | "collected"
+  | "recovered"
+  | "void";
+
+export function positionState(m: MarketAccount, pos: PositionAccount): PositionState {
+  const role = positionRole(m, pos);
+  if (role === "pending") return "open";
+  if (role === "winner") return canClaim(m, pos) ? "claimable" : "collected";
+  if (role === "void") return pos.principalWithdrawn ? "recovered" : "void";
+  // loser
+  if (pos.principalWithdrawn) return "recovered";
+  return isLockedLoser(m, pos) ? "locked" : "recoverable";
+}

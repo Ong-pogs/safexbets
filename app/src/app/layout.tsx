@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Oswald } from "next/font/google";
+import { AppNav } from "@/components/nav/AppNav";
+import { BottomTabBar } from "@/components/nav/BottomTabBar";
+import { PitchBackdrop } from "@/components/PitchBackdrop";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -37,7 +40,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <PitchBackdrop />
+          <AppNav />
+          {/* Bottom padding clears the mobile tab bar (+ its safe-area inset); none on desktop. */}
+          <div className="pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
+          <BottomTabBar />
+        </Providers>
       </body>
     </html>
   );

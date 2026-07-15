@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppHeader } from "@/components/AppHeader";
 import { MatchCenter } from "@/components/match/MatchCenter";
-import { PitchBackdrop } from "@/components/PitchBackdrop";
 import { loadReplay } from "@/lib/replay/server";
 
 /**
@@ -41,25 +39,20 @@ export default async function MatchPage({ params }: MatchPageProps) {
   if (!replay) notFound();
 
   return (
-    <>
-      <PitchBackdrop />
-      <AppHeader balance={null} />
+    <main className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6">
+      <nav className="flex flex-wrap items-center justify-between gap-2" aria-label="Breadcrumb">
+        <Link
+          href="/matches"
+          className="kit-label inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] text-mist transition hover:bg-white/5 hover:text-chalk"
+        >
+          ← All matches
+        </Link>
+        <span className="kit-label rounded-full border border-flood/25 bg-flood/[0.06] px-3 py-1 text-[10px] text-flood">
+          Match Center
+        </span>
+      </nav>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6">
-        <nav className="flex flex-wrap items-center justify-between gap-2" aria-label="Breadcrumb">
-          <Link
-            href="/"
-            className="kit-label inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] text-mist transition hover:bg-white/5 hover:text-chalk"
-          >
-            ← All markets
-          </Link>
-          <span className="kit-label rounded-full border border-flood/25 bg-flood/[0.06] px-3 py-1 text-[10px] text-flood">
-            Match Center
-          </span>
-        </nav>
-
-        <MatchCenter replay={replay} />
-      </main>
-    </>
+      <MatchCenter replay={replay} />
+    </main>
   );
 }

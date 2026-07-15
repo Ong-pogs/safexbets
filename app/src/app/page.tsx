@@ -1,20 +1,16 @@
 "use client";
 
-import { PublicKey } from "@solana/web3.js";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import { AppHeader } from "@/components/AppHeader";
+import { useCallback, useState } from "react";
 import { BetModal } from "@/components/BetModal";
 import { ConfigBanner } from "@/components/ConfigBanner";
-import { DemoControls } from "@/components/DemoControls";
 import { MarketsBoard } from "@/components/MarketsBoard";
-import { PitchBackdrop } from "@/components/PitchBackdrop";
-import { Portfolio } from "@/components/Portfolio";
+import { PositionsTeaser } from "@/components/bets/PositionsTeaser";
 import { useMarkets } from "@/hooks/useMarkets";
 import { usePositions } from "@/hooks/usePositions";
 import { useProgram } from "@/hooks/useProgram";
-import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { CONFIG, IS_PRINCIPAL_MINT_MISSING } from "@/lib/config";
+import { IS_PLACEHOLDER_PROGRAM, IS_PRINCIPAL_MINT_MISSING } from "@/lib/config";
+import { USDC_FAUCET_URL } from "@/lib/constants";
 import { TXLINE_COMPETITION, TXLINE_LABEL } from "@/lib/txline";
 import type { MarketRecord } from "@/lib/types";
 
@@ -22,94 +18,69 @@ export default function Home() {
   const { program, connection, wallet } = useProgram();
   const owner = wallet?.publicKey;
 
-  const principalMint = useMemo(() => {
-    if (IS_PRINCIPAL_MINT_MISSING) return null;
-    try {
-      return new PublicKey(CONFIG.principalMint);
-    } catch {
-      return null;
-    }
-  }, []);
-
   const { markets, loading, error, reload: reloadMarkets } = useMarkets(program);
   const { positions, reload: reloadPositions } = usePositions(program, owner);
-  const { amount: balance, reload: reloadBalance } = useTokenBalance(
-    connection,
-    owner,
-    principalMint ?? undefined,
-  );
 
   const [betRecord, setBetRecord] = useState<MarketRecord | null>(null);
 
   const reloadAll = useCallback(() => {
     void reloadMarkets();
     void reloadPositions();
-    void reloadBalance();
-  }, [reloadMarkets, reloadPositions, reloadBalance]);
+  }, [reloadMarkets, reloadPositions]);
 
   return (
-    <>
-      <PitchBackdrop />
-      <AppHeader balance={balance} />
+    <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
+      <Hero />
+      <FeaturedMatchCenter />
+      {(IS_PLACEHOLDER_PROGRAM || IS_PRINCIPAL_MINT_MISSING) && <ConfigBanner />}
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
-        <Hero />
-        <FeaturedMatchCenter />
-        <ConfigBanner />
+      <MarketsBoard
+        markets={markets}
+        loading={loading}
+        error={error}
+        connected={!!owner}
+        owner={owner}
+        onBet={setBetRecord}
+      />
 
-        <MarketsBoard
-          markets={markets}
-          loading={loading}
-          error={error}
-          connected={!!owner}
-          owner={owner}
-          onBet={setBetRecord}
-        />
-
-        {owner ? (
-          <>
-            <Portfolio
-              positions={positions}
-              markets={markets}
-              program={program}
-              connection={connection}
-              owner={owner}
-              onDone={reloadAll}
-            />
-            <DemoControls
-              markets={markets}
-              program={program}
-              connection={connection}
-              owner={owner}
-              principalMint={principalMint}
-              onDone={reloadAll}
-            />
-          </>
-        ) : (
-          <div className="panel p-8 text-center">
-            <p className="font-display text-lg uppercase tracking-wide text-chalk">
-              Connect a devnet wallet
+      {owner ? (
+        <PositionsTeaser positions={positions} markets={markets} />
+      ) : (
+        <div className="panel flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <p className="font-display text-base font-semibold uppercase tracking-wide text-chalk">
+              Connect a devnet wallet to play
             </p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-mist">
-              Connect to see your positions, place bets, and — as a market authority — open the Match
-              Control booth to run the demo.
+            <p className="mt-0.5 max-w-lg text-xs leading-relaxed text-mist">
+              Self-fund with devnet USDC at{" "}
+              <a
+                href={USDC_FAUCET_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-chalk-dim underline underline-offset-2 hover:text-flood"
+              >
+                faucet.circle.com
+              </a>{" "}
+              — then back a call. Your principal is never at risk.
             </p>
           </div>
-        )}
+          <span className="kit-label rounded-full border border-white/10 px-3 py-1.5 text-[10px] text-chalk-dim">
+            Use the wallet button ↑
+          </span>
+        </div>
+      )}
 
-        <Footer />
-      </main>
+      <Footer />
 
       <BetModal
         record={betRecord}
         program={program}
         connection={connection}
         owner={owner}
-        balance={balance}
         onClose={() => setBetRecord(null)}
         onDone={reloadAll}
       />
-    </>
+    </main>
   );
 }
 
@@ -134,10 +105,22 @@ function Hero() {
           <span className="text-chalk">100%</span>. A clean sheet — concede nothing.
         </p>
 
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <Link
+            href="/matches"
+            className="kit-label rounded-xl bg-flood px-5 py-3 text-sm text-pitch-900 transition hover:shadow-[0_10px_26px_-10px_rgba(203,255,62,0.6)]"
+          >
+            Browse the slate →
+          </Link>
+          <span className="text-[11px] text-mist">
+            Markets open automatically ~48h before kickoff · settled by TxLINE
+          </span>
+        </div>
+
         <div className="mt-7">
           <div className="kit-label mb-2 text-[10px] text-mist">How it works</div>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Step n="01" title="Back a side" body="Deposit mock-USDC on Yes or No. Odds emerge from the pools." />
+            <Step n="01" title="Back a side" body="Deposit devnet USDC on Yes or No. Odds emerge from the pools." />
             <Step n="02" title="TxLINE settles" body="The oracle posts the match result on-chain. No pricing engine." />
             <Step n="03" title="Clean sheet" body="Winners take the losers' yield; losers recover every cent of principal." />
           </div>
@@ -218,13 +201,19 @@ function Footer() {
         <span>
           SafeXBets · <span className="text-chalk-dim">You stake time, not money.</span>
         </span>
-        <span>Devnet · unaudited hackathon build · not financial advice</span>
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <Link href="/operator" className="transition hover:text-flood">
+            Operator booth
+          </Link>
+          <span aria-hidden>·</span>
+          <span>Devnet · unaudited hackathon build · not financial advice</span>
+        </span>
       </div>
       <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-mist/80">
-        Experimental software on Solana devnet using mock USDC — no real-money wagering, no
-        inducement to gamble. 18+ where prediction games are age-restricted; play for the sport,
-        not the stake. Match data is a TxLINE devnet replay; the 3D pitch view is a Metrica
-        open-data demo visualization.
+        Experimental software on Solana devnet using devnet USDC (self-serve at faucet.circle.com) —
+        no real-money wagering, no inducement to gamble. 18+ where prediction games are
+        age-restricted; play for the sport, not the stake. Match data is a TxLINE devnet replay; the
+        3D pitch view is a Metrica open-data demo visualization.
       </p>
     </footer>
   );

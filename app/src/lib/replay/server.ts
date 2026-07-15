@@ -29,7 +29,7 @@ export async function loadReplay(fixtureId: number): Promise<TrimmedReplay | nul
 
   if (process.env.TXLINE_API_TOKEN) {
     try {
-      const live = await fetchLiveReplay(fixtureId, process.env.TXLINE_API_TOKEN);
+      const live = await fetchLiveReplay(fixtureId);
       if (live && live.events.length > 0) {
         replayCache.set(fixtureId, live);
         return live;
@@ -60,14 +60,26 @@ async function guestJwt(): Promise<string> {
   return token;
 }
 
-async function fetchLiveReplay(fixtureId: number, apiToken: string): Promise<TrimmedReplay | null> {
+/**
+ * Authenticated TxLINE GET (guest JWT + X-Api-Token), shared by the replay loader and the
+ * fixtures route. Returns null when no TXLINE_API_TOKEN is configured — callers fall back to
+ * their bundled fixtures. One module-level JWT cache serves both.
+ */
+export async function txlineGet(pathname: string): Promise<Response | null> {
+  const apiToken = process.env.TXLINE_API_TOKEN;
+  if (!apiToken) return null;
   const jwt = await guestJwt();
-  const res = await fetch(`${TXLINE_API_BASE}/scores/historical/${fixtureId}`, {
+  const res = await fetch(`${TXLINE_API_BASE}${pathname}`, {
     headers: { Authorization: `Bearer ${jwt}`, "X-Api-Token": apiToken },
     cache: "no-store",
   });
   if (res.status === 401) cachedJwt = null; // JWT expired — next call re-acquires
-  if (!res.ok) return null;
+  return res;
+}
+
+async function fetchLiveReplay(fixtureId: number): Promise<TrimmedReplay | null> {
+  const res = await txlineGet(`/scores/historical/${fixtureId}`);
+  if (!res || !res.ok) return null;
 
   // scores/historical returns an SSE text stream: repeated "data: {json}" blocks.
   const raw: RawTxLineEvent[] = [];

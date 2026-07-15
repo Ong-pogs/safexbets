@@ -1,6 +1,7 @@
 "use client";
 
 import type { PublicKey } from "@solana/web3.js";
+import Link from "next/link";
 import { MarketCard } from "./MarketCard";
 import type { MarketRecord } from "@/lib/types";
 
@@ -21,7 +22,7 @@ export function MarketsBoard({
 }) {
   return (
     <section>
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h2 className="font-display text-xl font-bold uppercase tracking-wide text-chalk">
             Live Markets
@@ -30,6 +31,12 @@ export function MarketsBoard({
             {markets.length}
           </span>
         </div>
+        <Link
+          href="/matches"
+          className="kit-label rounded-lg px-2 py-1 text-[11px] text-flood transition hover:bg-flood/10"
+        >
+          All matches →
+        </Link>
       </div>
 
       {error && (
@@ -49,8 +56,15 @@ export function MarketsBoard({
           <span className="text-3xl">⚽</span>
           <p className="font-display text-lg uppercase tracking-wide text-chalk">No markets yet</p>
           <p className="max-w-sm text-sm text-mist">
-            Open <span className="text-chalk-dim">Match Control</span> below to create the first demo
-            market, then back a side. Winners take the losers&apos; yield — nobody loses principal.
+            Markets open automatically ~48h before each kickoff on the TxLINE slate. Check{" "}
+            <Link href="/matches" className="text-chalk-dim underline underline-offset-2 hover:text-flood">
+              the matches lobby
+            </Link>{" "}
+            for what&apos;s coming — or author a demo market from the{" "}
+            <Link href="/operator" className="text-chalk-dim underline underline-offset-2 hover:text-flood">
+              operator booth
+            </Link>
+            .
           </p>
         </div>
       ) : (

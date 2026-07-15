@@ -1,6 +1,6 @@
 "use client";
 
-import { PublicKey } from "@solana/web3.js";
+import type { PublicKey } from "@solana/web3.js";
 import clsx from "clsx";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
@@ -15,8 +15,7 @@ import { useMarkets } from "@/hooks/useMarkets";
 import { useNow } from "@/hooks/useNow";
 import { usePositions } from "@/hooks/usePositions";
 import { useProgram } from "@/hooks/useProgram";
-import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { CONFIG, IS_PRINCIPAL_MINT_MISSING } from "@/lib/config";
+import { CONFIG } from "@/lib/config";
 import { PRINCIPAL_SYMBOL } from "@/lib/constants";
 import { prettifyError } from "@/lib/errors";
 import { formatUsdc, formatUsdcCompact, pct, poolShare } from "@/lib/format";
@@ -42,22 +41,8 @@ export function MarketRail({ fixtureId }: { fixtureId: number }) {
   const owner = wallet?.publicKey;
   const now = useNow();
 
-  const principalMint = useMemo(() => {
-    if (IS_PRINCIPAL_MINT_MISSING) return null;
-    try {
-      return new PublicKey(CONFIG.principalMint);
-    } catch {
-      return null;
-    }
-  }, []);
-
   const { markets, loading, error, reload: reloadMarkets } = useMarkets(program);
   const { positions, reload: reloadPositions } = usePositions(program, owner);
-  const { amount: balance, reload: reloadBalance } = useTokenBalance(
-    connection,
-    owner,
-    principalMint ?? undefined,
-  );
 
   const record = useMemo(
     () => markets.find((m) => m.account.matchId.toNumber() === fixtureId) ?? null,
@@ -76,8 +61,7 @@ export function MarketRail({ fixtureId }: { fixtureId: number }) {
   const reloadAll = useCallback(() => {
     void reloadMarkets();
     void reloadPositions();
-    void reloadBalance();
-  }, [reloadMarkets, reloadPositions, reloadBalance]);
+  }, [reloadMarkets, reloadPositions]);
 
   return (
     <aside className="flex h-fit flex-col gap-3 lg:sticky lg:top-20" aria-label="On-chain market">
@@ -131,7 +115,6 @@ export function MarketRail({ fixtureId }: { fixtureId: number }) {
         program={program}
         connection={connection}
         owner={owner}
-        balance={balance}
         onClose={() => setBetRecord(null)}
         onDone={reloadAll}
       />
@@ -151,15 +134,14 @@ function EmptyRail({ fixtureId }: { fixtureId: number }) {
         No market yet
       </p>
       <p className="text-xs leading-relaxed text-mist">
-        Nobody has opened an on-chain market for fixture{" "}
-        <span className="led text-chalk-dim">#{fixtureId}</span>. A market authority can create one
-        from <span className="text-chalk-dim">Match Control</span> on the board.
+        No on-chain market for fixture <span className="led text-chalk-dim">#{fixtureId}</span> yet.
+        Markets open automatically ~48h before kickoff once the fixture is on the TxLINE slate.
       </p>
       <Link
-        href="/"
+        href="/matches"
         className="kit-label mt-2 rounded-xl border border-white/15 px-4 py-2 text-[11px] text-chalk transition hover:border-flood/60 hover:text-flood"
       >
-        Browse markets →
+        Browse matches →
       </Link>
     </div>
   );

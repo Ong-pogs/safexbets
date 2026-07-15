@@ -20,10 +20,10 @@ export default function MatchNotFound() {
         (Brazil vs Norway) ships with the app and always works.
       </p>
       <Link
-        href="/"
+        href="/matches"
         className="kit-label rounded-xl bg-flood px-5 py-3 text-sm text-pitch-900 transition hover:shadow-[0_10px_26px_-10px_rgba(203,255,62,0.6)]"
       >
-        Back to markets
+        Back to matches
       </Link>
     </main>
   );
