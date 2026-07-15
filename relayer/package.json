@@ -11,7 +11,8 @@
     "settle": "tsx src/index.ts settle",
     "seed": "tsx src/seed.ts",
     "list-fixtures": "tsx src/index.ts list-fixtures",
-    "seed-fixtures": "tsx src/index.ts seed-fixtures"
+    "seed-fixtures": "tsx src/index.ts seed-fixtures",
+    "keeper": "tsx src/keeper.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",

@@ -9,16 +9,20 @@ import { FeedTicker } from "./FeedTicker";
 import { MarketRail } from "./MarketRail";
 import { MatchScoreboard } from "./MatchScoreboard";
 import { StatsPanel } from "./StatsPanel";
-import { nextSpeed, Transport } from "./Transport";
+import { nextSpeed, Transport, type PlaybackSpeed } from "./Transport";
 
 /** Shared mutable clock — hot-path consumers (3D view, transport) read it inside their own rAF. */
 export interface PlaybackClock {
   progressRef: React.MutableRefObject<number>;
   playingRef: React.MutableRefObject<boolean>;
+  /** True when pace is "live" — the 3D layer then plays its clip at natural speed (looping). */
+  liveRef: React.MutableRefObject<boolean>;
 }
 
 /** Full replay run at 1× (spec: ~90 s), index-paced — the raw timestamps span days. */
 const RUN_SECONDS = 90;
+/** "Live" pace: the whole timeline over ≈ a real match (90' + stoppage). */
+const LIVE_RUN_SECONDS = 95 * 60;
 const BANNER_MS = 4200;
 
 // The Three.js scene ships only to visitors of this page, client-side only.
@@ -47,22 +51,24 @@ export function MatchCenter({ replay }: { replay: TrimmedReplay }) {
   // ---- master clock ----
   const progressRef = useRef(0);
   const playingRef = useRef(false);
-  const speedRef = useRef(1);
+  const liveRef = useRef(false);
+  const speedRef = useRef<PlaybackSpeed>(1);
   const lastIndexRef = useRef(-1);
   const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState<PlaybackSpeed>(1);
   const [stepIndex, setStepIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [banner, setBanner] = useState<{ side: TeamSide; minute: string; key: number } | null>(null);
   const bannerKey = useRef(0);
 
-  const clock = useMemo<PlaybackClock>(() => ({ progressRef, playingRef }), []);
+  const clock = useMemo<PlaybackClock>(() => ({ progressRef, playingRef, liveRef }), []);
 
   useEffect(() => {
     playingRef.current = playing;
   }, [playing]);
   useEffect(() => {
     speedRef.current = speed;
+    liveRef.current = speed === "live";
   }, [speed]);
 
   // Reduced motion: never autoplay (and the 3D layer drops its trail). Otherwise, roll the tape.
@@ -86,7 +92,9 @@ export function MatchCenter({ replay }: { replay: TrimmedReplay }) {
       last = now;
 
       if (playingRef.current) {
-        const next = progressRef.current + (dt * speedRef.current) / RUN_SECONDS;
+        const s = speedRef.current;
+        const rate = s === "live" ? 1 / LIVE_RUN_SECONDS : s / RUN_SECONDS;
+        const next = progressRef.current + dt * rate;
         if (next >= 1) {
           progressRef.current = 1;
           setPlaying(false); // full time — hold on FT

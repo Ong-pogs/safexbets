@@ -40,7 +40,12 @@ async function fundWallet(name: string, mintAuthority: Keypair) {
     PRINCIPAL_MINT!,
     kp.publicKey
   );
-  await mintTo(connection, mintAuthority, PRINCIPAL_MINT!, ata.address, mintAuthority, 5000 * unit);
+  try {
+    await mintTo(connection, mintAuthority, PRINCIPAL_MINT!, ata.address, mintAuthority, 5000 * unit);
+  } catch {
+    // Not the mint authority (e.g. PRINCIPAL_MINT is Circle devnet USDC) — fund manually instead:
+    console.warn(`  ! cannot mint ${PRINCIPAL_MINT!.toBase58()} — send USDC to ${kp.publicKey.toBase58()} via https://faucet.circle.com`);
+  }
   return kp;
 }
 

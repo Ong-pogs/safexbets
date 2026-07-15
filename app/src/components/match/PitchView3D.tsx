@@ -108,7 +108,13 @@ export default function PitchView3D({
       raf = requestAnimationFrame(loop);
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
-      const t = world.update(clock.progressRef.current, clock.playingRef.current, dt, viewRef.current);
+      const t = world.update(
+        clock.progressRef.current,
+        clock.playingRef.current,
+        dt,
+        viewRef.current,
+        clock.liveRef.current,
+      );
       telemetryTick -= dt;
       if (telemetryTick <= 0) {
         telemetryTick = 0.15;
@@ -263,7 +269,7 @@ interface WorldTelemetry {
 }
 
 interface PitchWorld {
-  update: (progress: number, playing: boolean, dt: number, view: ViewMode) => WorldTelemetry;
+  update: (progress: number, playing: boolean, dt: number, view: ViewMode, live: boolean) => WorldTelemetry;
   resize: (w: number, h: number) => void;
   resetBroadcastCamera: () => void;
   dispose: () => void;
@@ -573,20 +579,65 @@ function createPitchWorld({
   const homeMeshes = clip.homeJerseys.map((j) => makePlayer(j, HOME_COL, HOME_LABEL_CSS));
   const awayMeshes = clip.awayJerseys.map((j) => makePlayer(j, AWAY_COL, AWAY_LABEL_CSS));
 
-  /* ---------------- ball + trail ---------------- */
+  /* ---------------- ball + trail ----------------
+     The ball must never be swallowed by player capsules: it is oversized and bright, and it
+     carries two depthTest:false markers (an additive halo sprite + a lime ground ring) that
+     render straight through occluding bodies — the broadcast "puck glow" trick. */
+  const BALL_R = 0.55;
   const ball = new THREE.Mesh(
-    new THREE.SphereGeometry(0.42, 20, 16),
+    new THREE.SphereGeometry(BALL_R, 20, 16),
     new THREE.MeshStandardMaterial({
       color: 0xffffff,
       emissive: 0xf5fff9,
-      emissiveIntensity: 0.35,
+      emissiveIntensity: 0.85,
       roughness: 0.3,
     }),
   );
   ball.castShadow = true;
   scene.add(ball);
-  const ballGlow = new THREE.PointLight(0xd8ff8a, 6, 14, 2);
+  const ballGlow = new THREE.PointLight(0xd8ff8a, 10, 16, 2);
   scene.add(ballGlow);
+
+  function makeHaloTexture(): THREE.CanvasTexture {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(64, 64, 6, 64, 64, 60);
+    grad.addColorStop(0, "rgba(255,255,255,0.95)");
+    grad.addColorStop(0.35, "rgba(203,255,62,0.55)");
+    grad.addColorStop(1, "rgba(203,255,62,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+  const ballHalo = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: makeHaloTexture(),
+      transparent: true,
+      opacity: 0.9,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  ballHalo.scale.set(2.6, 2.6, 1);
+  ballHalo.renderOrder = 999;
+  scene.add(ballHalo);
+
+  const ballRing = new THREE.Mesh(
+    new THREE.RingGeometry(BALL_R, BALL_R + 0.28, 28),
+    new THREE.MeshBasicMaterial({
+      color: 0xcbff3e,
+      transparent: true,
+      opacity: 0.6,
+      side: THREE.DoubleSide,
+      depthTest: false,
+    }),
+  );
+  ballRing.rotation.x = -Math.PI / 2;
+  ballRing.renderOrder = 998;
+  scene.add(ballRing);
 
   const TRAIL_N = 90;
   const trailPos = new Float32Array(TRAIL_N * 3);
@@ -659,18 +710,28 @@ function createPitchWorld({
     }
     sample(fi, IDX_BALL, tmp);
     if (!tmp.hidden) {
-      dot(tmp.x, tmp.z, "#ffffff", 4);
-      dot(tmp.x, tmp.z, "rgba(203,255,62,0.35)", 7);
+      dot(tmp.x, tmp.z, "rgba(203,255,62,0.4)", 9);
+      dot(tmp.x, tmp.z, "#ffffff", 5);
     }
   }
 
   /* ---------------- per-frame update, driven by the page's master clock ---------------- */
   let lastFi = 0;
+  let liveClipT = 0; // live pace: the clip advances at its natural speed and loops
   const followTarget = new THREE.Vector3();
   const followGoal = new THREE.Vector3();
 
-  function update(progress: number, playing: boolean, dt: number, view: ViewMode): WorldTelemetry {
-    const clipT = Math.max(0, Math.min(1, progress)) * DURATION;
+  function update(progress: number, playing: boolean, dt: number, view: ViewMode, live: boolean): WorldTelemetry {
+    let clipT: number;
+    if (live) {
+      // Real match pace: progress-mapping would stretch a 12-min clip into slow motion, so the
+      // ambience plays 1:1 and loops instead. Facts upstream still follow the master progress.
+      if (playing) liveClipT = (liveClipT + dt) % DURATION;
+      clipT = liveClipT;
+    } else {
+      clipT = Math.max(0, Math.min(1, progress)) * DURATION;
+      liveClipT = clipT % DURATION;
+    }
     const fi = Math.min(clipT * FPS, FRAMES.length - 1);
     const jumped = Math.abs(fi - lastFi) > FPS * 0.5; // scrub — restart the trail, no streak
     lastFi = fi;
@@ -691,12 +752,18 @@ function createPitchWorld({
     const h = ballHeight[i0] + (ballHeight[Math.min(i0 + 1, FRAMES.length - 1)] - ballHeight[i0]) * (fi - i0);
     if (!tmp.hidden) {
       ball.visible = true;
-      ball.position.set(tmp.x, 0.42 + h, tmp.z);
+      ballHalo.visible = true;
+      ballRing.visible = true;
+      ball.position.set(tmp.x, BALL_R + h, tmp.z);
       if (playing) ball.rotation.x += ballSpeed[i0] * dt * 2;
       ballGlow.position.copy(ball.position);
       ballGlow.position.y += 1;
+      ballHalo.position.copy(ball.position);
+      ballRing.position.set(tmp.x, 0.03, tmp.z);
     } else {
       ball.visible = false;
+      ballHalo.visible = false;
+      ballRing.visible = false;
     }
 
     if (!reducedMotion) {
